@@ -1,0 +1,49 @@
+{
+  "skill_name": "Campus Shuttle Arrival Tracker",
+  "category": "Campus Mobility & Navigation",
+  "version": "1.0.0",
+  "description": "Navigates to the public campus transit web portal, searches for a designated shuttle stop, and extracts the next upcoming departure times and active delay alerts.",
+  "inputs": [
+    {
+      "name": "stop_name",
+      "type": "string",
+      "description": "Name or identifier of the campus shuttle stop to monitor",
+      "default": "North Campus Hub",
+      "dynamic": true
+    }
+  ],
+  "steps": [
+    {
+      "step_number": 1,
+      "action": "navigate",
+      "target_url": "https://transit.example.edu/shuttles/live",
+      "description": "Open the real-time shuttle tracking portal on the bot's cloud browser"
+    },
+    {
+      "step_number": 2,
+      "action": "input_search",
+      "target_field": "input[name='stop_search']",
+      "value_source": "$inputs.stop_name",
+      "description": "Enter the dynamic stop name into the search field"
+    },
+    {
+      "step_number": 3,
+      "action": "extract_data",
+      "selector": ".departure-row",
+      "fields": ["route_name", "departure_time", "status"],
+      "limit": 3,
+      "description": "Extract the next 3 departures and any active service advisories"
+    },
+    {
+      "step_number": 4,
+      "action": "render_card",
+      "format": "markdown_summary_card",
+      "description": "Format and deliver the transit briefing into the chat thread"
+    }
+  ],
+  "guardrails": {
+    "read_only": true,
+    "disallow_external_post": true,
+    "disallow_form_submission": true
+  }
+}
